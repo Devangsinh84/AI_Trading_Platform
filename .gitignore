@@ -1,0 +1,10 @@
+# Python
+Python_AI_Engine/venv/
+Python_AI_Engine/__pycache__/
+Python_AI_Engine/data/*.csv
+Python_AI_Engine/tensorboard_logs/
+
+# .NET
+DotNet_MetaController/MetaController.API/bin/
+DotNet_MetaController/MetaController.API/obj/
+appsettings.Development.json
