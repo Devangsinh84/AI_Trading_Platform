@@ -18,43 +18,70 @@ const PerformanceMetrics = () => {
       }
     };
 
+    // Fetch immediately, then poll every 3 seconds to keep it LIVE
     fetchMetrics();
+    const intervalId = setInterval(fetchMetrics, 3000);
+
+    // Cleanup the interval when the component unmounts
+    return () => clearInterval(intervalId);
   }, []);
 
-  if (loading) return <div className="text-white">Loading metrics...</div>;
+  // Helper function to prevent the "+-" bug for negative numbers
+  const formatReturn = (value) => {
+    const num = Number(value);
+    if (num > 0) return `+${num}%`;
+    if (num < 0) return `${num}%`;
+    return `0%`;
+  };
+
+  if (loading) {
+    return (
+      <div className="flex gap-6 mb-6 animate-pulse">
+        {[1, 2, 3].map(i => (
+          <div key={i} className="bg-slate-800/40 h-24 rounded-xl flex-1 border border-slate-700/30"></div>
+        ))}
+      </div>
+    );
+  }
 
   return (
-    <div className="flex gap-4 mb-6">
+    <div className="flex flex-col md:flex-row gap-6 mb-6">
       {/* Sharpe Ratio Card */}
-      <div className="bg-slate-800 p-4 rounded-lg border border-slate-700 flex-1 flex items-center justify-between">
+      <div className="bg-slate-800/60 backdrop-blur-md p-5 rounded-xl border border-slate-700/50 shadow-lg flex-1 flex items-center justify-between transition-all duration-300 hover:shadow-indigo-500/10">
         <div>
-          <p className="text-slate-400 text-sm font-medium mb-1">Sharpe Ratio</p>
-          <h3 className="text-2xl font-bold text-green-400">{metrics.sharpeRatio}</h3>
+          <p className="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-1">Sharpe Ratio</p>
+          <h3 className={`text-2xl font-bold font-mono ${metrics.sharpeRatio >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+            {metrics.sharpeRatio}
+          </h3>
         </div>
-        <div className="bg-slate-700 p-3 rounded-full">
-          <Activity className="text-green-400" size={24} />
+        <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700/50 shadow-inner">
+          <Activity className={metrics.sharpeRatio >= 0 ? "text-emerald-400" : "text-rose-400"} size={24} />
         </div>
       </div>
 
       {/* Maximum Drawdown Card */}
-      <div className="bg-slate-800 p-4 rounded-lg border border-slate-700 flex-1 flex items-center justify-between">
+      <div className="bg-slate-800/60 backdrop-blur-md p-5 rounded-xl border border-slate-700/50 shadow-lg flex-1 flex items-center justify-between transition-all duration-300 hover:shadow-rose-500/10">
         <div>
-          <p className="text-slate-400 text-sm font-medium mb-1">Max Drawdown</p>
-          <h3 className="text-2xl font-bold text-red-400">{metrics.maximumDrawdown}%</h3>
+          <p className="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-1">Max Drawdown</p>
+          <h3 className="text-2xl font-bold font-mono text-rose-400">
+            {metrics.maximumDrawdown}%
+          </h3>
         </div>
-        <div className="bg-slate-700 p-3 rounded-full">
-          <TrendingDown className="text-red-400" size={24} />
+        <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700/50 shadow-inner">
+          <TrendingDown className="text-rose-400" size={24} />
         </div>
       </div>
 
       {/* Cumulative Return Card */}
-      <div className="bg-slate-800 p-4 rounded-lg border border-slate-700 flex-1 flex items-center justify-between">
+      <div className="bg-slate-800/60 backdrop-blur-md p-5 rounded-xl border border-slate-700/50 shadow-lg flex-1 flex items-center justify-between transition-all duration-300 hover:shadow-emerald-500/10">
         <div>
-          <p className="text-slate-400 text-sm font-medium mb-1">Cumulative Return</p>
-          <h3 className="text-2xl font-bold text-emerald-400">+{metrics.cumulativeReturn}%</h3>
+          <p className="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-1">Cumulative Return</p>
+          <h3 className={`text-2xl font-bold font-mono ${metrics.cumulativeReturn >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+            {formatReturn(metrics.cumulativeReturn)}
+          </h3>
         </div>
-        <div className="bg-slate-700 p-3 rounded-full">
-          <TrendingUp className="text-emerald-400" size={24} />
+        <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700/50 shadow-inner">
+          <TrendingUp className={metrics.cumulativeReturn >= 0 ? "text-emerald-400" : "text-rose-400"} size={24} />
         </div>
       </div>
     </div>
