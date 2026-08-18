@@ -1,13 +1,21 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using MetaController.API.Services;
+using MetaController.API.Clients;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Register the Performance Metrics Service
+// 1. Register Services
 builder.Services.AddSingleton<PerformanceMetricsService>();
+builder.Services.AddHttpClient<PythonAiClient>();
 
-// 1. Enable CORS so Vite React (localhost:5173) can fetch data
+// 2. Register the In-Memory State Tracker
+builder.Services.AddSingleton<LivePortfolioState>();
+
+// 3. Enable CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
@@ -18,58 +26,87 @@ builder.Services.AddCors(options =>
     });
 });
 
-var app = builder.Build();
+builder.Services.AddControllers();
 
-// 2. Apply the CORS policy
+var app = builder.Build();
 app.UseCors("AllowReactApp");
 
-// 3. Keep your existing connection check endpoint
 app.MapGet("/scalar/v1", () => Results.Ok(new { status = "Connected" }));
 
-// 4. Expose the JSON REST endpoint for the React frontend
-app.MapGet("/api/trading-state", () =>
+// 4. LIVE Performance Metrics Endpoint (Dynamic Math)
+app.MapGet("/api/performance-metrics", (PerformanceMetricsService metricsService, LivePortfolioState state) =>
 {
-    var marketData = new[]
+    var portfolioValues = state.GetPortfolioHistory();
+    var dailyReturns = state.GetReturnsHistory();
+
+    if (portfolioValues.Count < 2)
     {
-        new { time = "09:30", price = 150, agent = "Bull", rsi = 45, vix = 15 },
-        new { time = "10:00", price = 152, agent = "Bull", rsi = 55, vix = 14 },
-        new { time = "10:30", price = 155, agent = "Bull", rsi = 65, vix = 16 },
-        new { time = "11:00", price = 148, agent = "Bear", rsi = 75, vix = 25 }, 
-        new { time = "11:30", price = 145, agent = "Bear", rsi = 60, vix = 28 },
-        new { time = "12:00", price = 142, agent = "Bear", rsi = 40, vix = 26 },
-        new { time = "12:30", price = 147, agent = "Bull", rsi = 35, vix = 18 }
-    };
+        return Results.Ok(new 
+        {
+            SharpeRatio = 0.0,
+            MaximumDrawdown = 0.0,
+            CumulativeReturn = 0.0,
+            Message = "Awaiting more data ticks..."
+        });
+    }
 
-    var shapData = new[]
-    {
-        new { feature = "VIX Volatility", importance = 0.85 },
-        new { feature = "RSI", importance = 0.45 },
-        new { feature = "MACD", importance = 0.30 },
-        new { feature = "Volume", importance = 0.15 }
-    };
+    var cumulativeReturn = metricsService.CalculateCumulativeReturn(portfolioValues);
+    var sharpeRatio = metricsService.CalculateSharpeRatio(dailyReturns);
+    var maxDrawdown = metricsService.CalculateMaximumDrawdown(portfolioValues);
 
-    return Results.Ok(new { marketData, shapData });
-});
-
-app.MapGet("/api/performance-metrics", (PerformanceMetricsService metricsService) =>
-{
-    // Mock historical data for testing the calculation engine
-    var mockDailyReturns = new List<double> { 0.012, -0.005, 0.021, 0.003, -0.015, 0.025, 0.008 };
-    var mockPortfolioValues = new List<double> { 10000, 10120, 10070, 10281, 10312, 10157, 10410, 10493 };
-    var cumulativeReturn = metricsService.CalculateCumulativeReturn(mockPortfolioValues);
-
-    // Run the calculations
-    var sharpeRatio = metricsService.CalculateSharpeRatio(mockDailyReturns);
-    var maxDrawdown = metricsService.CalculateMaximumDrawdown(mockPortfolioValues);
-
-    // Return the data as JSON
     return Results.Ok(new 
     {
-        SharpeRatio = sharpeRatio,
-        MaximumDrawdown = maxDrawdown,
-        CumulativeReturn = cumulativeReturn,
-        Message = "Calculated successfully"
+        SharpeRatio = Math.Round(sharpeRatio, 4),
+        MaximumDrawdown = Math.Round(maxDrawdown, 4),
+        CumulativeReturn = Math.Round(cumulativeReturn, 4),
+        Message = "Live calculations active"
     });
 });
 
+app.MapControllers();
 app.Run();
+
+// ==========================================
+// LIVE IN-MEMORY STATE TRACKER
+// ==========================================
+namespace MetaController.API.Services
+{
+    public class LivePortfolioState
+    {
+        private readonly List<double> _prices = new();
+        private readonly object _lock = new();
+
+        public void AddPriceTick(double currentPrice)
+        {
+            lock (_lock)
+            {
+                if (_prices.Count == 0 || _prices.Last() != currentPrice)
+                {
+                    _prices.Add(currentPrice);
+                }
+            }
+        }
+
+        public List<double> GetPortfolioHistory()
+        {
+            lock (_lock)
+            {
+                return _prices.ToList();
+            }
+        }
+
+        public List<double> GetReturnsHistory()
+        {
+            lock (_lock)
+            {
+                var returns = new List<double>();
+                for (int i = 1; i < _prices.Count; i++)
+                {
+                    double prev = _prices[i - 1];
+                    returns.Add((_prices[i] - prev) / prev);
+                }
+                return returns;
+            }
+        }
+    }
+}
