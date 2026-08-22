@@ -43,7 +43,7 @@ The platform is composed of three decoupled microservices that communicate over 
 └─────────────────────────────────────────────────────────────┘
 ```
 
-![Architecture Diagram](path/to/architecture_diagram.png)
+![Architecture Diagram](assets/architecture_diagram.png)
 
 The React Dashboard polls the .NET Meta-Controller for live market data and performance metrics. The Meta-Controller forwards prediction requests to the Python AI Engine and maintains an in-memory portfolio state tracker. The Python AI Engine hosts the trained PPO model and XGBoost baseline, returning predictions and SHAP feature importance payloads.
 
