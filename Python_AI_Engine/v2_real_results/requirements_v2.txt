@@ -1,0 +1,12 @@
+yfinance
+pandas
+numpy
+scikit-learn
+matplotlib
+joblib
+xgboost
+gymnasium
+stable-baselines3
+torch
+shap
+tensorboard
