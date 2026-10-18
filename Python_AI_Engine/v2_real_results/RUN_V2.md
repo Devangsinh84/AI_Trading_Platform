@@ -52,3 +52,18 @@ never traded on the test set: entropy fell to about -0.004 and SHAP showed the a
 almost entirely on its own current position. Training now uses random start dates, random
 initial positions, one-year episodes and an entropy bonus (ent_coef=0.01). Keep the run 1
 outputs (rename `results_v2` to `results_v2_run1`); they are a valid finding for the thesis.
+
+## Note on training run 2 (18 Oct 2026)
+
+Random starts + entropy bonus, return-only reward, 3 seeds x 200k steps. Every seed converged to a
+constant policy (seeds 1 and 3 always invested = Buy & Hold, seed 2 always in cash). SHAP values
+became tiny (~0.0007), confirming the indicators barely influence the decision. Interpretation:
+with real returns and costs, the indicators carry too little directional signal, so a constant
+policy is optimal for a return-only objective.
+
+## Run 3: risk-sensitive reward
+
+`python step2_train_ppo.py --seed 1 --risk 3` (and seeds 2, 3). Reward = r - 3*r^2 (mean-variance).
+Volatility is far more predictable than direction, so this objective gives the agent a learnable
+reason to step out of the market in turbulent periods. Models are saved as `ppo_v2_risk3_seedN`;
+step 3 evaluates return-only and risk-aware models side by side.

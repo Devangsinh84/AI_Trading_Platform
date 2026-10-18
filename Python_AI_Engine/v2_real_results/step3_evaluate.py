@@ -69,12 +69,17 @@ if __name__ == "__main__":
     strategies = {"Buy & Hold": np.ones(n, dtype=int),
                   "XGBoost": xgboost_positions(train, test)[:n]}
 
-    model_paths = sorted(glob.glob(os.path.join(MODEL_DIR, "ppo_v2_seed*.zip")))
+    model_paths = sorted(glob.glob(os.path.join(MODEL_DIR, "ppo_v2_*.zip")))
     if not model_paths:
         raise SystemExit("[!] No trained PPO model found. Run step2_train_ppo.py first.")
     for path in model_paths:
-        seed = os.path.basename(path).replace("ppo_v2_", "").replace(".zip", "")
-        strategies[f"PPO ({seed})"] = ppo_positions(path, test)[:n]
+        tag = os.path.basename(path).replace("ppo_v2_", "").replace(".zip", "")
+        if tag.startswith("risk"):                     # e.g. risk3_seed1
+            lam, seed = tag.split("_")
+            label = f"PPO risk-aware lambda={lam[4:]} ({seed})"
+        else:
+            label = f"PPO return-only ({tag})"
+        strategies[label] = ppo_positions(path, test)[:n]
 
     rows, curves, regime_rows = [], {}, []
     for name, pos in strategies.items():
@@ -97,10 +102,17 @@ if __name__ == "__main__":
 
     # Figure 5.1 (v2)
     fig, ax = plt.subplots(figsize=(11, 6))
-    styles = {"Buy & Hold": dict(color="gray", linestyle="--", linewidth=1.8),
+    styles = {"Buy & Hold": dict(color="black", linestyle="--", linewidth=2.2, zorder=5),
               "XGBoost": dict(color="darkorange", linewidth=1.8)}
+    blues = iter(["#93c5fd", "#3b82f6", "#1e3a8a", "#60a5fa", "#1d4ed8"])
+    greens = iter(["#86efac", "#16a34a", "#14532d", "#4ade80", "#15803d"])
     for name, values in curves.items():
-        style = styles.get(name, dict(linewidth=2.2))
+        if name in styles:
+            style = styles[name]
+        elif "risk-aware" in name:
+            style = dict(color=next(greens, None), linewidth=2.0)
+        else:
+            style = dict(color=next(blues, None), linewidth=1.4, linestyle=":")
         ret = table.loc[name, "Cumulative return (%)"]
         ax.plot(dates, values, label=f"{name} ({ret:+.2f}%)", **style)
     # shade high-volatility days

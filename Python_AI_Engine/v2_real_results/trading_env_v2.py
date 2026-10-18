@@ -17,7 +17,8 @@ REWARD_SCALE = 100.0   # 1% daily return -> reward of 1.0 (keeps PPO's numbers i
 class TradingEnvV2(gym.Env):
     metadata = {"render_modes": []}
 
-    def __init__(self, df, cost=TRANSACTION_COST, random_start=False, episode_length=252):
+    def __init__(self, df, cost=TRANSACTION_COST, random_start=False, episode_length=252,
+                 risk_aversion=0.0):
         """
         random_start=False (evaluation): start on the first day, in cash, and run to the end.
         random_start=True  (training):   each episode starts on a random day, in a random
@@ -25,12 +26,18 @@ class TradingEnvV2(gym.Env):
                                          This stops the agent from memorising one path
                                          ("buy once and hold") and forces it to learn when
                                          to be in or out of the market from any starting state.
+        risk_aversion (lambda): 0 = maximise return only.
+                                > 0 = risk-sensitive (mean-variance) reward:
+                                      reward = r - lambda * r^2
+                                      Large daily moves are penalised, so being out of the market
+                                      becomes attractive when volatility is expected to be high.
         """
         super().__init__()
         self.X = df[FEATURES].to_numpy(dtype=np.float32)
         self.next_ret = df["Next_Ret"].to_numpy(dtype=np.float64)
         self.cost = cost
         self.random_start = random_start
+        self.risk_aversion = risk_aversion
         self.episode_length = min(episode_length, len(self.X) - 2)
         self.action_space = spaces.Discrete(2)
         # features + current position
@@ -65,6 +72,7 @@ class TradingEnvV2(gym.Env):
         self.t += 1
         terminated = self.t >= self.end
 
-        reward = float(portfolio_return * REWARD_SCALE)
+        risk_adjusted = portfolio_return - self.risk_aversion * portfolio_return ** 2
+        reward = float(risk_adjusted * REWARD_SCALE)
         info = {"net_worth": self.net_worth, "position": self.position}
         return self._obs(), reward, terminated, False, info

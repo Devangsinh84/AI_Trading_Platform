@@ -25,10 +25,14 @@ if __name__ == "__main__":
     ap.add_argument("--steps", type=int, default=200_000)
     ap.add_argument("--ent", type=float, default=0.01, help="entropy coefficient")
     ap.add_argument("--episode", type=int, default=252, help="training episode length in days")
+    ap.add_argument("--risk", type=float, default=0.0,
+                    help="risk aversion lambda: 0 = return only; e.g. 3 = risk-sensitive reward r - 3*r^2")
     args = ap.parse_args()
 
     train = load_split(TRAIN_CSV)
-    env = Monitor(TradingEnvV2(train, random_start=True, episode_length=args.episode))
+    env = Monitor(TradingEnvV2(train, random_start=True, episode_length=args.episode,
+                               risk_aversion=args.risk))
+    name = f"ppo_v2_risk{args.risk:g}_seed{args.seed}" if args.risk > 0 else f"ppo_v2_seed{args.seed}"
 
     model = PPO(
         "MlpPolicy", env,
@@ -38,9 +42,9 @@ if __name__ == "__main__":
         tensorboard_log=f"{RESULTS_DIR}/tensorboard",
         device="cpu",
     )
-    print(f"[*] Training PPO, seed={args.seed}, steps={args.steps:,}, ent_coef={args.ent}, "
+    print(f"[*] Training {name}: steps={args.steps:,}, ent_coef={args.ent}, risk={args.risk}, "
           f"episode={args.episode} days, random starts...")
-    model.learn(total_timesteps=args.steps, tb_log_name=f"PPO_v2_seed{args.seed}")
-    path = f"{MODEL_DIR}/ppo_v2_seed{args.seed}"
+    model.learn(total_timesteps=args.steps, tb_log_name=name)
+    path = f"{MODEL_DIR}/{name}"
     model.save(path)
     print(f"[+] Saved model to {path}.zip")
