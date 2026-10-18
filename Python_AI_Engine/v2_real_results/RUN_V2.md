@@ -29,7 +29,7 @@ pip install -r requirements_v2.txt
 | Step | Command | Time on a laptop |
 |---|---|---|
 | 1. Data | `python step1_prepare_data.py` | ~1 min (needs internet) |
-| 2. Train PPO | `python step2_train_ppo.py` | ~20-45 min, leave it running |
+| 2. Train PPO | `python step2_train_ppo.py --seed 1` (then `--seed 2`, `--seed 3`) | ~10-15 min per seed |
 | 3. Evaluate | `python step3_evaluate.py` | ~1-2 min |
 | 4. SHAP | `python step4_shap.py` | ~5-20 min |
 
@@ -44,3 +44,11 @@ Everything in `results_v2/`:
 - `results_table.csv`, `regime_table.csv`, `figure_5_1_v2.png`
 - `shap_global.png`, `shap_by_regime.png`, `shap_by_regime.csv`
 - plus a copy of what each step printed in the terminal (screenshots are fine)
+
+## Note on training run 1 (18 Oct 2026)
+
+The first run (fixed start date, no entropy bonus, 100k steps) collapsed to a policy that
+never traded on the test set: entropy fell to about -0.004 and SHAP showed the agent relied
+almost entirely on its own current position. Training now uses random start dates, random
+initial positions, one-year episodes and an entropy bonus (ent_coef=0.01). Keep the run 1
+outputs (rename `results_v2` to `results_v2_run1`); they are a valid finding for the thesis.
