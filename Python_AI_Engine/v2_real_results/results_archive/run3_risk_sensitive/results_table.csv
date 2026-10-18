@@ -1,0 +1,9 @@
+Strategy,Cumulative return (%),Annualised return (%),Annualised volatility (%),Sharpe ratio,Maximum drawdown (%),Days invested (%),Number of trades
+Buy & Hold,46.94,21.5,16.0,1.297,18.9,100.0,1
+XGBoost,27.07,12.89,12.91,1.003,14.11,66.3,197
+PPO risk-aware lambda=3 (seed1),-6.36,-3.27,11.29,-0.239,18.9,25.3,3
+PPO risk-aware lambda=3 (seed2),20.61,9.95,12.09,0.844,12.86,38.6,1
+PPO risk-aware lambda=3 (seed3),46.94,21.5,16.0,1.297,18.9,100.0,1
+PPO return-only (seed1),46.94,21.5,16.0,1.297,18.9,100.0,1
+PPO return-only (seed2),-0.62,-0.31,0.28,-1.107,0.62,0.6,1
+PPO return-only (seed3),46.94,21.5,16.0,1.297,18.9,100.0,1

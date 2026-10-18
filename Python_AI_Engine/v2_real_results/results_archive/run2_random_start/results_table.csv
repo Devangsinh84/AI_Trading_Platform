@@ -1,0 +1,6 @@
+Strategy,Cumulative return (%),Annualised return (%),Annualised volatility (%),Sharpe ratio,Maximum drawdown (%),Days invested (%),Number of trades
+Buy & Hold,46.94,21.5,16.0,1.297,18.9,100.0,1
+XGBoost,27.07,12.89,12.91,1.003,14.11,66.3,197
+PPO (seed1),46.94,21.5,16.0,1.297,18.9,100.0,1
+PPO (seed2),-0.62,-0.31,0.28,-1.107,0.62,0.6,1
+PPO (seed3),46.94,21.5,16.0,1.297,18.9,100.0,1

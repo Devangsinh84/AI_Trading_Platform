@@ -1,0 +1,7 @@
+Strategy,Regime,Days,Days invested (%),Mean daily return (%)
+Buy & Hold,Calm (VIX < 20),410,100.0,0.0442
+Buy & Hold,High volatility (VIX >= 20),88,100.0,0.2613
+XGBoost,Calm (VIX < 20),410,67.8,0.0451
+XGBoost,High volatility (VIX >= 20),88,59.1,0.3047
+PPO (seed1),Calm (VIX < 20),410,0.0,0.0
+PPO (seed1),High volatility (VIX >= 20),88,0.0,0.0
