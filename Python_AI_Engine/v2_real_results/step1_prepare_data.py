@@ -27,7 +27,12 @@ def download(ticker):
 def build(spx: pd.DataFrame, vix: pd.DataFrame):
     df = add_indicators(spx[["Open", "High", "Low", "Close", "Volume"]])
     df["VIX"] = vix["Close"].reindex(df.index).ffill()
+    zero_volume_days = int((spx["Volume"] == 0).sum())
+    if zero_volume_days:
+        print(f"[i] {zero_volume_days} days with zero volume in Yahoo data; filled with the previous day's volume.")
+    before = len(df)
     df = df.dropna()
+    print(f"[i] Dropped {before - len(df)} rows with missing values (indicator warm-up period).")
 
     split = int(len(df) * TRAIN_FRACTION)
     train, test = df.iloc[:split].copy(), df.iloc[split:].copy()

@@ -81,12 +81,16 @@ def add_indicators(df: pd.DataFrame) -> pd.DataFrame:
     df["Ret_1d"] = close.pct_change()
     df["Ret_5d"] = close.pct_change(5)
     df["Vol_20d"] = df["Ret_1d"].rolling(20).std()
-    df["Volume_chg"] = np.log(df["Volume"] / df["Volume"].rolling(20).mean())
+    # Yahoo reports Volume = 0 on some index days; treat those as missing and carry the last value forward
+    volume = df["Volume"].replace(0, np.nan).ffill()
+    df["Volume_chg"] = np.log(volume / volume.rolling(20).mean())
 
     # Return earned by holding the index from today's close to tomorrow's close.
     # This is what an action taken today is paid on.
     df["Next_Ret"] = close.pct_change().shift(-1)
-    return df
+
+    # Safety net: any division by zero becomes missing, and missing rows are dropped later
+    return df.replace([np.inf, -np.inf], np.nan)
 
 
 # ----------------------------------------------------------------------
