@@ -5,3 +5,4 @@ venv/
 __pycache__/
 results_v2/
 results_v2_run*/
+models_v2_run*/
