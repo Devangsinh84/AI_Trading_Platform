@@ -1,0 +1,119 @@
+-------------------------------------------
+| rollout/                |               |
+|    ep_len_mean          | 1.99e+03      |
+|    ep_rew_mean          | 71.2          |
+| time/                   |               |
+|    fps                  | 284           |
+|    iterations           | 47            |
+|    time_elapsed         | 338           |
+|    total_timesteps      | 96256         |
+| train/                  |               |
+|    approx_kl            | 0.00018354127 |
+|    clip_fraction        | 0.0022        |
+|    clip_range           | 0.2           |
+|    entropy_loss         | -0.00843      |
+|    explained_variance   | 0.548         |
+|    learning_rate        | 0.0003        |
+|    loss                 | 2.43          |
+|    n_updates            | 460           |
+|    policy_gradient_loss | -0.000151     |
+|    value_loss           | 4.12          |
+-------------------------------------------
+------------------------------------------
+| rollout/                |              |
+|    ep_len_mean          | 1.99e+03     |
+|    ep_rew_mean          | 72           |
+| time/                   |              |
+|    fps                  | 284          |
+|    iterations           | 48           |
+|    time_elapsed         | 345          |
+|    total_timesteps      | 98304        |
+| train/                  |              |
+|    approx_kl            | 0.0007445739 |
+|    clip_fraction        | 0.000635     |
+|    clip_range           | 0.2          |
+|    entropy_loss         | -0.00373     |
+|    explained_variance   | 0.548        |
+|    learning_rate        | 0.0003       |
+|    loss                 | 1.77         |
+|    n_updates            | 470          |
+|    policy_gradient_loss | -1.93e-05    |
+|    value_loss           | 4.13         |
+------------------------------------------
+-------------------------------------------
+| rollout/                |               |
+|    ep_len_mean          | 1.99e+03      |
+|    ep_rew_mean          | 72.7          |
+| time/                   |               |
+|    fps                  | 283           |
+|    iterations           | 49            |
+|    time_elapsed         | 354           |
+|    total_timesteps      | 100352        |
+| train/                  |               |
+|    approx_kl            | 0.00028467563 |
+|    clip_fraction        | 0.00371       |
+|    clip_range           | 0.2           |
+|    entropy_loss         | -0.00447      |
+|    explained_variance   | 0.543         |
+|    learning_rate        | 0.0003        |
+|    loss                 | 2.87          |
+|    n_updates            | 480           |
+|    policy_gradient_loss | -0.00095      |
+|    value_loss           | 4.32          |
+-------------------------------------------
+[+] Saved model to D:\AI_Trading_Platform\Python_AI_Engine\v2_real_results\models_v2/ppo_v2_seed1.zip
+(venv) PS D:\AI_Trading_Platform\Python_AI_Engine\v2_real_results> python step3_evaluate.py
+
+================ TEST PERIOD RESULTS ================
+Period: 2024-01-04 -> 2025-12-30  (498 trading days, 0.1% cost per trade)
+             Cumulative return (%)  Annualised return (%)  Annualised volatility (%)  Sharpe ratio  Maximum drawdown (%)  Days invested (%)  Number of trades
+Strategy
+Buy & Hold                   46.94                  21.50                      16.00         1.297                 18.90              100.0                 1
+XGBoost                      27.07                  12.89                      12.91         1.003                 14.11               66.3               197
+PPO (seed1)                   0.00                   0.00                       0.00         0.000                  0.00                0.0                 0
+
+================ BY VIX REGIME ================
+   Strategy                      Regime  Days  Days invested (%)  Mean daily return (%)
+ Buy & Hold             Calm (VIX < 20)   410              100.0                 0.0442
+ Buy & Hold High volatility (VIX >= 20)    88              100.0                 0.2613
+    XGBoost             Calm (VIX < 20)   410               67.8                 0.0451
+    XGBoost High volatility (VIX >= 20)    88               59.1                 0.3047
+PPO (seed1)             Calm (VIX < 20)   410                0.0                 0.0000
+PPO (seed1) High volatility (VIX >= 20)    88                0.0                 0.0000
+
+[+] Saved table, curves and figure to D:\AI_Trading_Platform\Python_AI_Engine\v2_real_results\results_v2
+(venv) PS D:\AI_Trading_Platform\Python_AI_Engine\v2_real_results> python step4_shap.py --days 150
+[*] Explaining 150 test days with SHAP (nsamples=300)...
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 150/150 [00:18<00:00,  8.21it/s]
+
+=========== GLOBAL IMPORTANCE (highest first) ===========
+Current position     0.6283
+Volume change        0.0119
+RSI (14)             0.0113
+MACD signal          0.0078
+VIX                  0.0075
+MACD histogram       0.0074
+Bollinger width      0.0062
+20-day volatility    0.0036
+Bollinger %B         0.0032
+1-day return         0.0018
+5-day return         0.0007
+MACD                 0.0004
+
+=========== BY REGIME ===========
+                   Calm (VIX < 20, n=124)  High volatility (VIX >= 20, n=26)
+Current position                   0.6327                             0.6072
+Volume change                      0.0096                             0.0231
+RSI (14)                           0.0101                             0.0166
+MACD signal                        0.0066                             0.0135
+VIX                                0.0070                             0.0098
+MACD histogram                     0.0051                             0.0184
+Bollinger width                    0.0046                             0.0134
+20-day volatility                  0.0028                             0.0076
+Bollinger %B                       0.0027                             0.0054
+1-day return                       0.0012                             0.0044
+5-day return                       0.0005                             0.0014
+MACD                               0.0004                             0.0005
+
+[+] Saved SHAP results to D:\AI_Trading_Platform\Python_AI_Engine\v2_real_results\results_v2
+(venv) PS D:\AI_Trading_Platform\Python_AI_Engine\v2_real_results> 

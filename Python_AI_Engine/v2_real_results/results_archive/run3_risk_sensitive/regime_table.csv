@@ -1,0 +1,17 @@
+Strategy,Regime,Days,Days invested (%),Mean daily return (%)
+Buy & Hold,Calm (VIX < 20),410,100.0,0.0442
+Buy & Hold,High volatility (VIX >= 20),88,100.0,0.2613
+XGBoost,Calm (VIX < 20),410,67.8,0.0451
+XGBoost,High volatility (VIX >= 20),88,59.1,0.3047
+PPO risk-aware lambda=3 (seed1),Calm (VIX < 20),410,22.9,-0.0179
+PPO risk-aware lambda=3 (seed1),High volatility (VIX >= 20),88,36.4,0.0263
+PPO risk-aware lambda=3 (seed2),Calm (VIX < 20),410,34.6,0.0143
+PPO risk-aware lambda=3 (seed2),High volatility (VIX >= 20),88,56.8,0.1636
+PPO risk-aware lambda=3 (seed3),Calm (VIX < 20),410,100.0,0.0442
+PPO risk-aware lambda=3 (seed3),High volatility (VIX >= 20),88,100.0,0.2613
+PPO return-only (seed1),Calm (VIX < 20),410,100.0,0.0442
+PPO return-only (seed1),High volatility (VIX >= 20),88,100.0,0.2613
+PPO return-only (seed2),Calm (VIX < 20),410,0.7,-0.0013
+PPO return-only (seed2),High volatility (VIX >= 20),88,0.0,0.0
+PPO return-only (seed3),Calm (VIX < 20),410,100.0,0.0442
+PPO return-only (seed3),High volatility (VIX >= 20),88,100.0,0.2613
