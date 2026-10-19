@@ -327,9 +327,17 @@ The next development phase has the following items scoped:
 
 ---
 
+## How to Cite
+
+If you use this code or its results, please cite it. GitHub's **"Cite this repository"** button (from [`CITATION.cff`](CITATION.cff)) provides APA and BibTeX formats:
+
+> Gohil, D. (2026). *Architecting a Regime-Aware Deep Reinforcement Learning Microservice Ecosystem for Explainable Algorithmic Trading* [Computer software]. ECE Paris. https://github.com/Devangsinh84/AI_Trading_Platform
+
+---
+
 ## License
 
-Distributed under the MIT License. See `LICENSE` for more information.
+Distributed under the MIT License. See `LICENSE` for more information. Reuse is permitted provided the copyright notice is kept.
 
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
