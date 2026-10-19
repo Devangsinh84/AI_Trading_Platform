@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use this software or its results, please cite it as below."
+title: "Architecting a Regime-Aware Deep Reinforcement Learning Microservice Ecosystem for Explainable Algorithmic Trading"
+type: software
+authors:
+  - family-names: Gohil
+    given-names: Devangsinh
+    affiliation: "ECE Paris"
+repository-code: "https://github.com/Devangsinh84/AI_Trading_Platform"
+license: MIT
+date-released: 2026-10-18
+abstract: >-
+  MSc thesis project: a decoupled Python / .NET / React microservice architecture for
+  explainable, regime-aware deep reinforcement learning trading, with a corrected evaluation
+  pipeline (real returns, transaction costs, Sharpe ratio, maximum drawdown) and SHAP
+  explanations of a PPO agent on S&P 500 and VIX data.
+keywords:
+  - deep reinforcement learning
+  - algorithmic trading
+  - explainable AI
+  - SHAP
+  - market regimes
+  - microservices
