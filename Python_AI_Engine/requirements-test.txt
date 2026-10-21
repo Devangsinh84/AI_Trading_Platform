@@ -1,0 +1,6 @@
+# Lightweight dependencies for the automated test suite (no PyTorch / data download needed).
+# Install with: pip install -r requirements-test.txt
+numpy
+pandas
+gymnasium
+pytest

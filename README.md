@@ -1,5 +1,6 @@
 # Architecting a Regime-Aware Deep Reinforcement Learning Microservice Ecosystem for Explainable Algorithmic Trading
 
+[![CI](https://github.com/Devangsinh84/AI_Trading_Platform/actions/workflows/ci.yml/badge.svg)](https://github.com/Devangsinh84/AI_Trading_Platform/actions/workflows/ci.yml)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Python](https://img.shields.io/badge/Python-3.11+-blue?logo=python)
 ![.NET](https://img.shields.io/badge/.NET-10.0-purple?logo=dotnet)
@@ -23,6 +24,7 @@ This repository contains a **working proof-of-concept** of that architecture, no
 | Rigorous evaluation with real returns, transaction costs, Sharpe and drawdown (`v2_real_results`) | Implemented |
 | SHAP explanations computed on the trained PPO policy, overall and by VIX regime (`v2_real_results`) | Implemented |
 | FastAPI service → .NET Meta-Controller → React dashboard data flow | Implemented |
+| Automated tests (pytest + xUnit) and CI on every push / pull request | Implemented |
 | Dashboard regime label and SHAP chart | **Placeholder data** (interface demonstration) |
 | VIX-driven regime routing / circuit breaker in the Meta-Controller | Planned |
 | Specialised Bull/Bear sub-agents, crypto markets, LIME, Docker | Planned |
@@ -131,9 +133,12 @@ AI_Trading_Platform/
 │   ├── data_ingestion.py      # Historical data processing pipeline
 │   ├── ai_preprocessing.py    # Feature engineering
 │   ├── requirements.txt
+│   ├── requirements-test.txt  # Lightweight dependencies for the test suite
+│   ├── tests/                 # pytest suite for the v2 pipeline
 │   └── v2_real_results/       # Corrected evaluation pipeline, real SHAP, archived results
 │
 ├── DotNet_MetaController/     # Orchestration layer: proxy + metrics API (circuit breaker planned)
+│   ├── MetaController.Tests/  # xUnit tests for the metrics service and portfolio state
 │   └── MetaController.API/
 │       ├── Controllers/       # TradingIntelligenceController (live-feed, evaluate)
 │       ├── Services/          # PerformanceMetricsService + LivePortfolioState
@@ -278,6 +283,31 @@ The dashboard will be available at `http://localhost:5173`.
 | Python AI Engine | FastAPI / Uvicorn | `8000` |
 | DotNet MetaController | ASP.NET Core | `5200` |
 | React Dashboard | Vite Dev Server | `5173` |
+
+---
+
+## Testing & CI
+
+Every push to `main` and every pull request runs the [CI workflow](.github/workflows/ci.yml) on GitHub Actions:
+
+| Job | What it checks |
+|---|---|
+| **Python AI engine** (pytest) | Backtester and metrics (returns, transaction costs, Sharpe, drawdown), technical indicators (no look-ahead, no infinite values), and the v2 trading environment, including a check that the RL environment and the backtester compute the same portfolio value |
+| **.NET Meta-Controller** (xUnit) | `PerformanceMetricsService` (cumulative return, maximum drawdown, Sharpe) and `LivePortfolioState` (returns history, defensive copies, thread safety) |
+| **React dashboard** | Production build with Vite |
+
+Run the tests locally:
+
+```bash
+# Python (from Python_AI_Engine/)
+pip install -r requirements-test.txt
+pytest
+
+# .NET (from DotNet_MetaController/)
+dotnet test MetaController.Tests/MetaController.Tests.csproj
+```
+
+The tests use small synthetic data, so they need no market data download and no GPU.
 
 ---
 
