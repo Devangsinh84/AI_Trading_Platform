@@ -8,3 +8,8 @@ Python_AI_Engine/tensorboard_logs/
 DotNet_MetaController/MetaController.API/bin/
 DotNet_MetaController/MetaController.API/obj/
 appsettings.Development.json
+# Tests
+.pytest_cache/
+Python_AI_Engine/tests/__pycache__/
+DotNet_MetaController/MetaController.Tests/bin/
+DotNet_MetaController/MetaController.Tests/obj/
